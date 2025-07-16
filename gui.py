@@ -25,8 +25,30 @@ from classi import Data, gestione_errori_data
 class myApp:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("800x600")
-        self.root.title("Gestione Hotel")
+        self.root.geometry("900x700")
+        self.root.title("🏨 Sistema Gestione Hotel")
+        self.root.configure(bg="#f0f4f8")
+
+        # Palette colori moderna
+        self.colors = {
+            'primary': '#2c3e50',
+            'secondary': '#3498db',
+            'success': '#27ae60',
+            'warning': '#f39c12',
+            'danger': '#e74c3c',
+            'light': '#ecf0f1',
+            'dark': '#34495e',
+            'white': '#ffffff',
+            'bg': '#f0f4f8'
+        }
+
+        # Font migliorati
+        self.fonts = {
+            'title': ('Segoe UI', 20, 'bold'),
+            'subtitle': ('Segoe UI', 14, 'bold'),
+            'normal': ('Segoe UI', 11),
+            'small': ('Segoe UI', 9)
+        }
 
         # Inizializza l'hotel
         self.hotel = Hotel()
@@ -34,7 +56,7 @@ class myApp:
             self.hotel.carica("hotel_base.txt")
         except Exception as e:
             messagebox.showerror("Errore", f"Impossibile caricare hotel_base.txt: {e}")
-            self.hotel = Hotel()  # Se il caricamento del file fallisce, crea un hotel vuoto per assicurare che l'applicazione sia comunque utilizzabile
+            self.hotel = Hotel()
 
         # Configurazione dell'interfaccia
         self.crea_frame()
@@ -45,70 +67,160 @@ class myApp:
         self.mostra_frame_principale()
 
         # Bind per uscire con ESC
-        self.root.bind('<Escape>', lambda
-            e: self.root.destroy())  # le lambda sono funzioni anonime che non hanno bisogno di essere definite, in questo caso serve per chiudere l'applicazione quando si preme ESC
+        self.root.bind('<Escape>', lambda e: self.root.destroy())
 
     # Metodi per la configurazione dei frame
     def crea_frame(self):
-        """Configura il frame principale"""
-        self.main_frame = tk.Frame(self.root)
+        """Configura il frame principale con design migliorato"""
+        self.main_frame = tk.Frame(self.root, bg=self.colors['bg'])
 
-        # Canvas per visualizzare le stanze
-        self.canvas = tk.Canvas(self.main_frame, bg="white")
-        self.canvas.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        # Header elegante
+        header_frame = tk.Frame(self.main_frame, bg=self.colors['primary'], height=100)
+        header_frame.pack(fill=tk.X, padx=0, pady=0)
+        header_frame.pack_propagate(False)
+
+        title_label = tk.Label(header_frame, text="🏨 SISTEMA GESTIONE HOTEL",
+                              font=self.fonts['title'],
+                              bg=self.colors['primary'],
+                              fg=self.colors['white'])
+        title_label.pack(expand=True)
+
+        # Frame contenuto principale
+        content_frame = tk.Frame(self.main_frame, bg=self.colors['bg'])
+        content_frame.pack(fill=tk.BOTH, expand=True, padx=30, pady=30)
+
+        # Sezione stanze con bordo
+        stanze_frame = tk.Frame(content_frame, bg=self.colors['white'], relief='solid', bd=1)
+        stanze_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 20))
+
+        stanze_title = tk.Label(stanze_frame, text="📋 STANZE DISPONIBILI",
+                               font=self.fonts['subtitle'],
+                               bg=self.colors['white'],
+                               fg=self.colors['primary'])
+        stanze_title.pack(pady=20)
+
+        # Canvas migliorato
+        self.canvas = tk.Canvas(stanze_frame, bg=self.colors['white'], highlightthickness=0)
+        scrollbar = tk.Scrollbar(stanze_frame, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.pack(side="right", fill="y", padx=(0, 10))
+        self.canvas.pack(side="left", fill="both", expand=True, padx=20, pady=(0, 20))
+
         self.aggiorna_visualizzazioni_stanze()
 
-        # Pulsanti principali
-        btn_frame = tk.Frame(self.main_frame)
-        btn_frame.pack(fill=tk.X, padx=10, pady=10)
+        # Pulsanti con stile moderno
+        btn_frame = tk.Frame(content_frame, bg=self.colors['bg'])
+        btn_frame.pack(fill=tk.X, pady=20)
 
-        tk.Button(btn_frame, text="Area Clienti", command=self.mostra_frame_cliente, width=15).pack(side=tk.LEFT,
-                                                                                                    padx=5)
-        tk.Button(btn_frame, text="Gestione Albergo", command=self.mostra_frame_management, width=15).pack(side=tk.LEFT,
-                                                                                                           padx=5)
-        tk.Button(btn_frame, text="Esci", command=self.root.destroy, width=15).pack(side=tk.RIGHT, padx=5)
+        # Stile pulsanti migliorato
+        btn_clienti = tk.Button(btn_frame, text="👥 Area Clienti",
+                               command=self.mostra_frame_cliente,
+                               font=self.fonts['normal'],
+                               bg=self.colors['secondary'],
+                               fg=self.colors['white'],
+                               relief='flat',
+                               padx=25, pady=12,
+                               cursor='hand2',
+                               borderwidth=0)
+        btn_clienti.pack(side=tk.LEFT, padx=(0, 15))
+
+        btn_gestione = tk.Button(btn_frame, text="⚙️ Gestione Albergo",
+                                command=self.mostra_frame_management,
+                                font=self.fonts['normal'],
+                                bg=self.colors['success'],
+                                fg=self.colors['white'],
+                                relief='flat',
+                                padx=25, pady=12,
+                                cursor='hand2',
+                                borderwidth=0)
+        btn_gestione.pack(side=tk.LEFT, padx=7)
+
+        btn_esci = tk.Button(btn_frame, text="❌ Esci",
+                           command=self.root.destroy,
+                           font=self.fonts['normal'],
+                           bg=self.colors['danger'],
+                           fg=self.colors['white'],
+                           relief='flat',
+                           padx=25, pady=12,
+                           cursor='hand2',
+                           borderwidth=0)
+        btn_esci.pack(side=tk.RIGHT, padx=(15, 0))
 
     def crea_frame_cliente(self):
-        """Configura il frame area clienti"""
-        self.client_frame = tk.Frame(self.root, bg="lightblue")
+        """Configura il frame area clienti con design migliorato"""
+        self.client_frame = tk.Frame(self.root, bg=self.colors['bg'])
 
-        tk.Label(self.client_frame, text="Area Clienti", font=("Arial", 16)).pack(pady=20)
+        # Header colorato
+        header_frame = tk.Frame(self.client_frame, bg=self.colors['secondary'], height=100)
+        header_frame.pack(fill=tk.X)
+        header_frame.pack_propagate(False)
 
-        # Lista di pulsanti con le relative funzioni
+        title_label = tk.Label(header_frame, text="👥 AREA CLIENTI",
+                              font=self.fonts['title'],
+                              bg=self.colors['secondary'],
+                              fg=self.colors['white'])
+        title_label.pack(expand=True)
+
+        # Contenuto centrato
+        content_frame = tk.Frame(self.client_frame, bg=self.colors['bg'])
+        content_frame.pack(fill=tk.BOTH, expand=True, padx=80, pady=50)
+
+        # Pulsanti con icone e colori diversi
         bottoni = [
-            ("Prenota una stanza", self.popup_prenotazione),
-            (
-            "Disdici prenotazione", lambda: self.popup_input("Disdici", "ID prenotazione:", self.elimina_prenotazione)),
-            ("Prezzo prenotazione",
-             lambda: self.popup_input("Prezzo", "ID prenotazione:", self.mostra_prezzo_prenotazione)),
-            ("Stanze libere",
-             lambda: self.popup_input("Stanze libere", "Data (gg/mm):", self.mostra_stanze_disponibili)),
-            ("Torna indietro", self.mostra_frame_principale)
+            ("🛏️ Prenota una stanza", self.popup_prenotazione, self.colors['success']),
+            ("❌ Disdici prenotazione", lambda: self.popup_input("Disdici", "ID prenotazione:", self.elimina_prenotazione), self.colors['warning']),
+            ("💰 Prezzo prenotazione", lambda: self.popup_input("Prezzo", "ID prenotazione:", self.mostra_prezzo_prenotazione), self.colors['secondary']),
+            ("📅 Stanze libere", lambda: self.popup_input("Stanze libere", "Data (gg/mm):", self.mostra_stanze_disponibili), self.colors['primary']),
+            ("⬅️ Torna indietro", self.mostra_frame_principale, self.colors['dark'])
         ]
 
-        for text, command in bottoni:
-            tk.Button(self.client_frame, text=text, command=command, width=25).pack(pady=5)
+        for text, command, color in bottoni:
+            btn = tk.Button(content_frame, text=text, command=command,
+                           font=self.fonts['normal'],
+                           bg=color, fg=self.colors['white'],
+                           relief='flat', padx=40, pady=15,
+                           cursor='hand2', width=30,
+                           borderwidth=0)
+            btn.pack(pady=12)
 
     def crea_frame_manageriale(self):
-        """Configura il frame gestione albergo"""
-        self.management_frame = tk.Frame(self.root, bg="lightgreen")
+        """Configura il frame gestione albergo con design migliorato"""
+        self.management_frame = tk.Frame(self.root, bg=self.colors['bg'])
 
-        tk.Label(self.management_frame, text="Gestione Albergo", font=("Arial", 16)).pack(pady=20)
+        # Header
+        header_frame = tk.Frame(self.management_frame, bg=self.colors['success'], height=100)
+        header_frame.pack(fill=tk.X)
+        header_frame.pack_propagate(False)
 
-        # Lista di pulsanti con le relative funzioni
+        title_label = tk.Label(header_frame, text="⚙️ GESTIONE ALBERGO",
+                              font=self.fonts['title'],
+                              bg=self.colors['success'],
+                              fg=self.colors['white'])
+        title_label.pack(expand=True)
+
+        # Contenuto
+        content_frame = tk.Frame(self.management_frame, bg=self.colors['bg'])
+        content_frame.pack(fill=tk.BOTH, expand=True, padx=80, pady=50)
+
+        # Pulsanti gestionali
         buttons = [
-            ("Carica hotel", lambda: self.popup_input("Carica", "Nome file:", self.carica_hotel)),
-            ("Salva hotel", lambda: self.popup_input("Salva", "Nome file:", self.salva_hotel)),
-            ("Mostra prenotazioni", self.mostra_tutte_prenotazioni),
-            ("Prenotazioni cliente",
-             lambda: self.popup_input("Cerca cliente", "Nome cliente:", self.mostra_prenotazioni_per_cliente)),
-            ("Stato stanze per data",
-             lambda: self.popup_input("Stato stanze", "Data (gg/mm):", self.mostra_stato_stanza)),
-            ("Torna indietro", self.mostra_frame_principale)
+            ("📁 Carica hotel", lambda: self.popup_input("Carica", "Nome file:", self.carica_hotel), self.colors['primary']),
+            ("💾 Salva hotel", lambda: self.popup_input("Salva", "Nome file:", self.salva_hotel), self.colors['secondary']),
+            ("📋 Mostra prenotazioni", self.mostra_tutte_prenotazioni, self.colors['success']),
+            ("🔍 Prenotazioni cliente", lambda: self.popup_input("Cerca cliente", "Nome cliente:", self.mostra_prenotazioni_per_cliente), self.colors['warning']),
+            ("📊 Stato stanze per data", lambda: self.popup_input("Stato stanze", "Data (gg/mm):", self.mostra_stato_stanza), self.colors['danger']),
+            ("⬅️ Torna indietro", self.mostra_frame_principale, self.colors['dark'])
         ]
 
-        for text, command in buttons:
-            tk.Button(self.management_frame, text=text, command=command, width=25).pack(pady=5)
+        for text, command, color in buttons:
+            btn = tk.Button(content_frame, text=text, command=command,
+                           font=self.fonts['normal'],
+                           bg=color, fg=self.colors['white'],
+                           relief='flat', padx=40, pady=15,
+                           cursor='hand2', width=30,
+                           borderwidth=0)
+            btn.pack(pady=12)
 
     # Metodi per la gestione dei frame
     def mostra_frame_principale(self):
@@ -130,23 +242,37 @@ class myApp:
 
     # Metodi per la visualizzazione delle stanze
     def aggiorna_visualizzazioni_stanze(self):
-        """Aggiorna la visualizzazione delle stanze ogni volta che viene fatto un qualche cambiamento"""
+        """Aggiorna la visualizzazione delle stanze con design migliorato"""
         self.canvas.delete("all")
         y = 20
 
-        self.canvas.create_text(400, y, text="BENVENUTI NEL NOSTRO HOTEL\nEcco la lista delle stanze che offriamo:",
-                                font=("Arial", 14, "bold"))
-        y += 40
+        for i, stanza in enumerate(self.hotel.stanze.values()):
+            # Colori per tipo stanza
+            if stanza.get_tipo_stanza() == "Singola":
+                icon = "🛏️"
+                color = self.colors['secondary']
+            elif stanza.get_tipo_stanza() == "Doppia":
+                icon = "🛏️🛏️"
+                color = self.colors['success']
+            else:  # Suite
+                icon = "🏛️"
+                color = self.colors['warning']
 
-        for stanza in self.hotel.stanze.values():
-            text = f"{stanza.get_tipo_stanza()} {stanza.get_numero_stanza()}"
-            if hasattr(stanza,
-                       'get_extra'):  # controlliamo se la stanza ha attributi extra con il hasattr che controlla se l'oggetto contiene quell attributo
-                text += f" (Extra:{', '.join(stanza.get_extra())})"
+            text = f"{icon} {stanza.get_tipo_stanza()} {stanza.get_numero_stanza()}"
 
-            self.canvas.create_text(20, y, text=text, anchor="w",
-                                    font=("Arial", 12))
-            y += 20
+            if hasattr(stanza, 'get_extra'):
+                text += f" (Extra: {', '.join(stanza.get_extra())})"
+
+            # Card per ogni stanza con ombra
+            card_bg = '#f8f9fa' if i % 2 == 0 else self.colors['white']
+
+            # Bordo colorato
+            self.canvas.create_rectangle(10, y-10, 450, y+20,
+                                       fill=card_bg, outline=color, width=2)
+
+            self.canvas.create_text(20, y+5, text=text, anchor="w",
+                                  font=self.fonts['normal'], fill=color)
+            y += 35
 
     # Metodi generici per popup
     def popup_input(self, titolo, testo,
