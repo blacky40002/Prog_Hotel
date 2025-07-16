@@ -1,0 +1,6 @@
+Hotel
+Singola,401,1,75.0
+Doppia,402,2,120.0
+Suite,403,6,300.0
+1,401,1/9,5/9,TestCliente,1
+2,402,10/9,15/9,AltroCliente,2

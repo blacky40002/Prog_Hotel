@@ -1,0 +1,9 @@
+Hotel
+Singola,100,1,50.0
+Singola,101,1,50.0
+Doppia,102,2,50.0
+Suite,103,4,200.0
+1,101,1/1,1/2,Tizio,1
+2,102,1/1,1/2,Caio,1
+4,103,1/1,2/1,Sempronio,3
+5,103,1/3,1/4,Sempronio,1

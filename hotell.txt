@@ -1,0 +1,9 @@
+Hotel
+Singola,100,1,50.0
+Singola,101,1,30.0
+Doppia,102,2,40.0
+Doppia,103,2,60.0
+Suite,104,6,300.0
+Suite,105,4,200.0
+1,101,1/1,5/1,Pinco Panco,1
+2,102,1/1,5/1,Pinco Panco,2
