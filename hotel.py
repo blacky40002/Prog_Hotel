@@ -278,7 +278,12 @@ class Hotel:
             # Salvataggio delle stanze
             for stanza in self.stanze.values():
                 tipo = stanza.get_tipo_stanza()
-                file.write(f"{tipo},{stanza.get_numero_stanza()},{stanza.get_posti()},{stanza.get_prezzo_base()}\n")
+                if tipo == "Suite":
+                    # Per le Suite, salviamo anche gli extra
+                    extra_str = ";".join(stanza.get_extra())
+                    file.write(f"{tipo},{stanza.get_numero_stanza()},{stanza.get_posti()},{stanza.get_prezzo_base()},{extra_str}\n")
+                else:
+                    file.write(f"{tipo},{stanza.get_numero_stanza()},{stanza.get_posti()},{stanza.get_prezzo_base()}\n")
             # Salvataggio delle prenotazioni
             for prenotazione in self.prenotazioni.values():
                 file.write(
@@ -310,9 +315,9 @@ class Hotel:
 
                 parti = riga.split(',')
 
-                # Se è una stanza (formato: Tipo,Numero,Posti,Prezzo)
-                if len(parti) == 4:
-                    tipo, numero, posti, prezzo = parti
+                # Se è una stanza (formato: Tipo,Numero,Posti,Prezzo[,Extra] per Suite)
+                if len(parti) == 4 or len(parti) == 5:
+                    tipo, numero, posti, prezzo = parti[:4]
                     numero = int(numero)
                     posti = int(posti)
                     prezzo = float(prezzo)
@@ -322,7 +327,14 @@ class Hotel:
                     elif tipo == "Doppia":
                         nuovo_stanze[numero] = Doppia(numero, prezzo)
                     elif tipo == "Suite":
-                        nuovo_stanze[numero] = Suite(numero, posti, ["TV", "Frigo"], prezzo)
+                        if len(parti) == 5:
+                            # Suite con extra specifici
+                            extra_str = parti[4]
+                            extra = extra_str.split(';') if extra_str else ["TV", "Frigo"]
+                        else:
+                            # Suite senza extra specifici, usa default
+                            extra = ["TV", "Frigo"]
+                        nuovo_stanze[numero] = Suite(numero, posti, extra, prezzo)
                     else:
                         raise ValueError(f"Tipo di stanza non riconosciuto: {tipo}")
 
@@ -354,9 +366,9 @@ class Hotel:
         for pren in self.prenotazioni.values():
             if pren.numero_stanza == numero_stanza:
                 # Verifica sovrapposizione: due intervalli si sovrappongono se:
-                # data_arrivo <= pren.data_partenza AND data_partenza >= pren.data_arrivo
-                # Non permettiamo nemmeno prenotazioni consecutive che si toccano
-                if data_arrivo <= pren.data_partenza and data_partenza >= pren.data_arrivo:
+                # data_arrivo < pren.data_partenza AND data_partenza > pren.data_arrivo
+                # Permettiamo prenotazioni consecutive che si toccano (= diventa <)
+                if data_arrivo < pren.data_partenza and data_partenza > pren.data_arrivo:
                     return False
         return True
 

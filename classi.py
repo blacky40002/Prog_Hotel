@@ -189,9 +189,10 @@ class Prenotazione:
             if self.data_arrivo is None:
                 raise ValueError("Impostare la data di arrivo prima della data di partenza")
             if value < self.data_arrivo:
-                if value.mese < self.data_arrivo.mese:
-                    raise ValueError("Prenotazioni a cavallo dell'anno non ammesse")
                 raise ValueError("La data di partenza non può essere precedente alla data di arrivo.")
+            # Controllo prenotazioni a cavallo anno
+            if value.mese < self.data_arrivo.mese:
+                raise ValueError("Prenotazioni a cavallo dell'anno non ammesse")
             self._data_partenza = value
         except ValueError as e:
             raise TypeError(f"Errore nella creazione della data di partenza della prenotazione con errore: {e}") from e

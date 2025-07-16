@@ -239,8 +239,8 @@ def test_hotel_gestione_avanzata():
 
     # Test 3: Prenotazioni per cliente
     try:
-        # Aggiungi altra prenotazione per Bob
-        hotel.prenota(201, Data(1, 7), Data(5, 7), "Bob", 1)
+        # Aggiungi altra prenotazione per Bob su date che non si sovrappongono
+        hotel.prenota(201, Data(1, 7), Data(5, 7), "Bob", 1)  # Tornato a 201 ma con date diverse
         prenotazioni_bob = hotel.get_prenotazioni_cliente("Bob")
         risultati.append(testEqual(len(prenotazioni_bob), 2))
         print("✓ Prenotazioni multiple per cliente")
