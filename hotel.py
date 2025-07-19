@@ -317,6 +317,10 @@ class Hotel:
                     posti = int(posti)
                     prezzo = float(prezzo)
 
+                    # Controllo doppioni
+                    if numero in nuovo_stanze:
+                        raise ValueError(f"Stanza duplicata trovata nel file: stanza numero {numero}")
+
                     if tipo == "Singola":
                         nuovo_stanze[numero] = Singola(numero, prezzo)
                     elif tipo == "Doppia":
@@ -334,6 +338,10 @@ class Hotel:
                     persone = int(persone)
                     data_arrivo, data_partenza = Hotel.parsing_date(data_arr, data_part)
                     # Parsing delle date
+
+                    # Controllo doppioni prenotazioni
+                    if id_pren in nuovo_prenotazioni:
+                        raise ValueError(f"Prenotazione duplicata trovata nel file: ID prenotazione {id_pren}")
 
                     nuovo_prenotazioni[id_pren] = Prenotazione(id_pren, num_stanza, data_arrivo, data_partenza, nome,
                                                                persone)
@@ -353,9 +361,7 @@ class Hotel:
         """
         for pren in self.prenotazioni.values():
             if pren.numero_stanza == numero_stanza:
-                # Verifica sovrapposizione: due intervalli si sovrappongono se:
-                # data_arrivo <= pren.data_partenza AND data_partenza >= pren.data_arrivo
-                # Non permettiamo nemmeno prenotazioni consecutive che si toccano
+
                 if data_arrivo <= pren.data_partenza and data_partenza >= pren.data_arrivo:
                     return False
         return True
