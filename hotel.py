@@ -278,7 +278,11 @@ class Hotel:
             # Salvataggio delle stanze
             for stanza in self.stanze.values():
                 tipo = stanza.get_tipo_stanza()
-                file.write(f"{tipo},{stanza.get_numero_stanza()},{stanza.get_posti()},{stanza.get_prezzo_base()}\n")
+                if tipo == "Suite":
+                    extra_str = "|".join(stanza.get_extra())
+                    file.write(f"{tipo},{stanza.get_numero_stanza()},{stanza.get_posti()},{stanza.get_prezzo_base()},{extra_str}\n")
+                else:
+                    file.write(f"{tipo},{stanza.get_numero_stanza()},{stanza.get_posti()},{stanza.get_prezzo_base()}\n")
             # Salvataggio delle prenotazioni
             for prenotazione in self.prenotazioni.values():
                 file.write(
@@ -310,26 +314,30 @@ class Hotel:
 
                 parti = riga.split(',')
 
-                # Se è una stanza (formato: Tipo,Numero,Posti,Prezzo)
-                if len(parti) == 4:
+                # Se è una suite (formato: Suite,Numero,Posti,Prezzo,Extra)
+                if len(parti) == 5 and parti[0] == "Suite":
+                    tipo, numero, posti, prezzo, extra_str = parti
+                    numero = int(numero)
+                    posti = int(posti)
+                    prezzo = float(prezzo)
+                    extra = extra_str.split("|") if extra_str else []
+                    if numero in nuovo_stanze:
+                        raise ValueError(f"Stanza duplicata trovata nel file: stanza numero {numero}")
+                    nuovo_stanze[numero] = Suite(numero, posti, extra, prezzo)
+                # Se è una stanza normale (formato: Tipo,Numero,Posti,Prezzo)
+                elif len(parti) == 4:
                     tipo, numero, posti, prezzo = parti
                     numero = int(numero)
                     posti = int(posti)
                     prezzo = float(prezzo)
-
-                    # Controllo doppioni
                     if numero in nuovo_stanze:
                         raise ValueError(f"Stanza duplicata trovata nel file: stanza numero {numero}")
-
                     if tipo == "Singola":
                         nuovo_stanze[numero] = Singola(numero, prezzo)
                     elif tipo == "Doppia":
                         nuovo_stanze[numero] = Doppia(numero, prezzo)
-                    elif tipo == "Suite":
-                        nuovo_stanze[numero] = Suite(numero, posti, ["TV", "Frigo"], prezzo)
                     else:
                         raise ValueError(f"Tipo di stanza non riconosciuto: {tipo}")
-
                 # Se è una prenotazione (formato: ID,NumeroStanza,DataArrivo,DataPartenza,NomeCliente,NumeroPersone)
                 elif len(parti) == 6:
                     id_pren, num_stanza, data_arr, data_part, nome, persone = parti
@@ -337,15 +345,10 @@ class Hotel:
                     num_stanza = int(num_stanza)
                     persone = int(persone)
                     data_arrivo, data_partenza = Hotel.parsing_date(data_arr, data_part)
-                    # Parsing delle date
-
-                    # Controllo doppioni prenotazioni
                     if id_pren in nuovo_prenotazioni:
                         raise ValueError(f"Prenotazione duplicata trovata nel file: ID prenotazione {id_pren}")
-
                     nuovo_prenotazioni[id_pren] = Prenotazione(id_pren, num_stanza, data_arrivo, data_partenza, nome,
                                                                persone)
-
                 else:
                     raise ValueError("Il file contiene una riga con formato non riconosciuto")
 

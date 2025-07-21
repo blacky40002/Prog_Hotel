@@ -37,7 +37,7 @@ class Data:
             if self._mese is None:  # controllo che il mese sia stato impostato
                 raise ValueError("Impossibile impostare il giorno: il mese non è ancora stato definito.")
             giorni_max = self.mappa_mesi.get(self._mese)
-            gestione_errori_data(valore, int, 0, giorni_max + 1)
+            valore = gestione_errori_data(valore, int, 0, giorni_max + 1)  # CORRETTO: uso il valore restituito
             self._giorno = valore
         except ValueError as e:
             raise TypeError(f"Errore nella creazione del giorno della Data con errore: {e}") from e
@@ -49,7 +49,7 @@ class Data:
     @mese.setter
     def mese(self, valore):
         try:
-            gestione_errori_data(valore, int, 0, 13)
+            valore = gestione_errori_data(valore, int, 0, 13)  # CORRETTO: uso il valore restituito
             self._mese = valore
         except ValueError as e:
             raise TypeError(f"Errore nella creazione del mese della Data con errore: {e}") from e
@@ -149,7 +149,7 @@ class Prenotazione:
     @id_prenotazione.setter
     def id_prenotazione(self, value):
         try:
-            gestione_errori_data(value, int, 0)
+            gestione_errori_data(value, int, 1)
             self._id_prenotazione = value
         except ValueError as e:
             raise TypeError(f"Errore con la creazione della prenotazione con errore: {e}") from e
@@ -220,7 +220,7 @@ class Prenotazione:
     @numero_persone.setter
     def numero_persone(self, value):
         try:
-            gestione_errori_data(value, int, 0)
+            gestione_errori_data(value, int, 1)  # minimo=1: almeno una persona per prenotazione
             self._numero_persone = value
         except ValueError as e:
             raise TypeError(f"Errore con il numero della prenotazione con errore: {e}") from e
