@@ -25,7 +25,7 @@ from classi import Data, gestione_errori_data
 class myApp:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("900x700")
+        self.root.geometry("900x1000")
         self.root.title("🏨 Sistema Gestione Hotel")
         self.root.configure(bg="#f0f4f8")
 
@@ -208,6 +208,8 @@ class myApp:
             ("📁 Carica hotel", lambda: self.popup_input("Carica", "Nome file:", self.carica_hotel), self.colors['primary']),
             ("💾 Salva hotel", lambda: self.popup_input("Salva", "Nome file:", self.salva_hotel), self.colors['secondary']),
             ("📋 Mostra prenotazioni", self.mostra_tutte_prenotazioni, self.colors['success']),
+            ("👥 Persone per data", lambda: self.popup_input("Persone", "Data (gg/mm):", self.mostra_persone_data), self.colors['primary']),
+            ("🏨 Hotel completo per data",  lambda: self.popup_input("Hotel completo", "Data (gg/mm):", self.mostra_hotel_completo_data),  self.colors['secondary']),
             ("🔍 Prenotazioni cliente", lambda: self.popup_input("Cerca cliente", "Nome cliente:", self.mostra_prenotazioni_per_cliente), self.colors['warning']),
             ("📊 Stato stanze per data", lambda: self.popup_input("Stato stanze", "Data (gg/mm):", self.mostra_stato_stanza), self.colors['danger']),
             ("⬅️ Torna indietro", self.mostra_frame_principale, self.colors['dark'])
@@ -423,6 +425,46 @@ class myApp:
         except Exception as e:
             messagebox.showerror("Errore", str(e))
 
+
+    def mostra_persone_data(self, data_str):
+        """Mostra il numero totale di persone nell'hotel in una data"""
+        try:
+            data, _ = Hotel.parsing_date(data_str, data_str)
+            prenotazioni = self.hotel.get_prenotazioni_data(data)
+
+            totale_persone = sum(p.numero_persone for p in prenotazioni)
+
+            message = f"Persone nell'hotel al {data_str}: {totale_persone}"
+            messagebox.showinfo("Persone nell'hotel", message)
+        except Exception as e:
+            messagebox.showerror("Errore", str(e))
+
+
+    def mostra_hotel_completo_data(self, data_str):
+        """Mostra lo stato completo dell'hotel con tutti i dettagli"""
+        try:
+            data, _ = Hotel.parsing_date(data_str, data_str)
+            prenotazioni = self.hotel.get_prenotazioni_data(data)
+            stanze_libere = self.hotel.get_stanze_libere(data)
+
+            message = f"STATO HOTEL AL {data_str}\n\n"
+            message += "STANZE OCCUPATE:\n"
+
+            for p in prenotazioni:
+                stanza = self.hotel.stanze[p.numero_stanza]
+                message += f"Stanza {p.numero_stanza} ({stanza.get_tipo_stanza()}): "
+                message += f"{p.nome_cliente} ({p.numero_persone} persone)\n"
+
+            message += f"\nSTANZE LIBERE: {len(stanze_libere)}\n"
+            for s in stanze_libere:
+                message += f"Stanza {s.get_numero_stanza()} ({s.get_tipo_stanza()})\n"
+
+            totale_persone = sum(p.numero_persone for p in prenotazioni)
+            message += f"\nTOTALE PERSONE: {totale_persone}"
+
+            messagebox.showinfo("Stato Hotel Completo", message)
+        except Exception as e:
+            messagebox.showerror("Errore", str(e))
 
 if __name__ == "__main__":
     root = tk.Tk()
